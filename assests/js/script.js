@@ -16,69 +16,87 @@ const getDate = (date) => {
     return `${newdate.getMonth() + 1}/${newdate.getDate()}/${newdate.getFullYear()}`
 }
 
-const getWeather = (city) => {
+function getWeather(city) {
     let lat
     let lon
 
-    const query1 = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_key}` //current
-    const query2 = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}` //5 days 3 hourly forecast
+    const query1 = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${Api_Key}` //current
+    
 
     fetch(query1)
+    .then((res) => res.json())
+    .then((res) => {
+        if(!res){ return null}
+
+        lat = res.coord.lat
+        lon = res.coord.lon
+        // console.log(lat);
+        // console.log(lon);
+        data.current.temp = res.main.temp
+        data.current.humidity = res.main.humidity
+        data.current.wind = res.wind.speed
+        cityName = res.name
+        
+        const query2 = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${Api_Key}` //5 days 3 hourly forecast
+        fetch(query2)
+        .then((res) => res.json())
         .then((res) => {
-            if(!res){ return null}
+            // data.forecast.length = 0
+            console.log(data);
+            console.log(res.list[0].weather);
+            console.log(res.list[0]);
+            data.current.icon = res.list[0].weather[0].icon
+            data.current.date = getDate(res.list[0].dt)
 
-            lat = res.coord.lat
-            lon = res.coord.lon
-            data.current.temp = res.main.temp
-            data.current.humidity = res.main.humidity
-            data.current.wind = res.wind.speed
-            cityName = res.name
+            data.forecast = []
+            for(let i = 0; i < 40; i = i + 8){
+                let day = {
+                    date: getDate(res.list[i].dt),
+                    temp: res.list[i].main.temp,
+                    icon: res.list[i].weather[0].icon,
+                    wind: res.list[i].wind.speed,
+                    
+                }
+                data.forecast.push(day)
+                // console.log(day);
+                // return data
+
+            }
+            // return data
+           
+            const record = {...data, city: cityName}
+            history.push(record)
+            showWeather(record)
+            displayHistory(record.city)
+            saveSearchedData(history)
+            // document.querySelectorAll('.search-entry').forEach((entry) => entry.addEventListener('click', historyBtn))
             
-            fetch(query2)
-                .then((res) => res.json())
-                .then((res) => {
-                    data.forecast.length = 0
-                    data.current.icon = res.weather[0].icon
-                    data.current.date = getDate(res.dt[0])
-
-                    for(let i = 0; i < 40; i = i + 8){
-                        let day = {
-                            date: getDate(res.dt[i]),
-                            temp: res.main[i].temp,
-                            icon: res.weather[i].icon,
-                            wind: res.wind[i].speed,
-                            
-                        }
-                        data.forecast.push(day)
-                        console.log(day);
-                        return data
-
-                    }
-
-                }).catch((error) => {
-                    console.log('Error', error);
-                    return res.json()
-                })
-
         }).catch((error) => {
             console.log('Error', error);
-            return res.json()
+            return //res.json()
         })
+
+    }).catch((error) => {
+        console.log('Error', error);
+        return //res.json()
+    })
 }
+
+
 
 const showWeather = (weatherData) => {
     const currentWeather = document.getElementById('current-weather')
     currentWeather.innerHTML = `
     <div class="card-body">
         <h2 class="d-inline-block mr-3">${weatherData.city} ${weatherData.current.date}</h2>
-        <img class="d-inline-block" src=" http://openweathermap.org/img/wn/${weatherData.current.icon}@2x.png" alt="weather icon">
+        <img class="d-inline-block" src=" http://openweathermap.org/img/wn/${weatherData.current.icon}@2x.png" alt="weather icon"></img>
         <p>Temperature: ${weatherData.current.temp} &#8451;</p>
         <p>Humidity: ${weatherData.current.temp} %</p>
         <p>Wind Speed: ${weatherData.current.wind} km/h</p>
     </div>`
 
     const fiveDayForecast = document.getElementById('five-day-forecast')
-    // fiveDayForecast.innerHTML = ``
+    fiveDayForecast.innerHTML = ``
     weatherData.forecast.forEach((day) => {
         fiveDayForecast.innerHTML += `
         <div class="col-lg">
@@ -108,16 +126,16 @@ function saveSearchedData(history){
     localStorage.setItem('searchHistory', JSON.stringify(history))
 }
 
-const historyBtn = (event) => {
-    const historyCity = event.target.getAttribute('data-city-name')
-    history.forEach((record) => {
-        if(record === historyCity) {
-            showWeather(record)
-        }
-    })
-}
+// const historyBtn = (event) => {
+//     const historyCity = event.target.getAttribute('data-city-name')
+//     history.forEach((record) => {
+//         if(record === historyCity) {
+//             showWeather(record)
+//         }
+//     })
+// }
 
-const init = () => {
+function init() {
     const receive = localStorage.getItem('searchHistory')
     if(receive){
         history = JSON.parse(receive)
@@ -136,30 +154,46 @@ const checkBad = (data) => {
 }
 
 function submitSearch(event) {
-    event.preventDefault()
-    const city = document.getElementById("city-name").value();
+    event.preventDefault();
+    const city = document.getElementById("city-input")
+    .value
+    .trim()
+    .replace(/\s+/g,' ')
+    
     console.log(city);
-        // .value()
-        // .trim()
-        // .replace(/\s+/g,' ')
-    getWeather(city)
-    .then((data) => {
-        if(checkBad(data)){
-            return
-        }
-        const record = {...data, city: cityName}
-        history.push(record)
-        showWeather(record)
-        displayHistory(record.city)
-        saveSearchedData(history)
-        document.querySelectorAll('.search-entry').forEach((entry) => entry.addEventListener('click', historyBtn))
-    })
+
+    let render = {};
+    render = getWeather(city)
+    console.log(render);
+    // if(checkBad(!render)){
+    //     return
+    // }else{
+    //     const record = {...data, city: cityName}
+    //     history.push(record)
+    //     showWeather(record)
+    //     displayHistory(record.city)
+    //     saveSearchedData(history)
+    //     document.querySelectorAll('.search-entry').forEach((entry) => entry.addEventListener('click', historyBtn))
+    // }
+
+
 }
 
 init()
 
 document.getElementById('search-city').addEventListener('submit', submitSearch)
-document.querySelectorAll('.search-entry').forEach((entry) => entry.addEventListener('click', historyBtn))
+// document.querySelectorAll('.search-entry').forEach((entry) => entry.addEventListener('click', historyBtn))
 
+const searchHistory = document.getElementById('search-history')
 
+searchHistory.addEventListener('click', (event) => {
+  if (event.target.classList.contains('search-entry')) {
+    const historyCity = event.target.getAttribute('data-city-name')
+    history.forEach((record) => {
+        if(record === historyCity) {
+            showWeather(record)
+        }
+    })
+  }
+})
 
