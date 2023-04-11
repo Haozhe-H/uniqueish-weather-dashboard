@@ -1,23 +1,29 @@
 # uniqueish-weather-dashboard
 
-  ## Description:
-  ### This is a weather dashboard that use OpenWeatherMap Api data and display the current weather and a 5-day forcast of the searched location.
+## Description:
 
-  ## Installation:
-  ### N/A
+### This is a weather dashboard that use OpenWeatherMap Api data and display the current weather and a 5-day forcast of the searched location.
 
-  ## Usage:
-  ### To use this application, enter location in the search bar and click the search button. The current weather and 5-day forcast will be displayed on the right. The history search are stored and shown on the left. 
-  ![page screenshot](./assests/image/screenshot.JPG)
+## Installation:
 
+### N/A
 
-  ## Credits:
-  ### OpenWeatherMap: https://openweathermap.org/
+## Usage:
 
-  ## License: MIT ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+### To use this application, enter location in the search bar and click the search button. The current weather and 5-day forcast will be displayed on the right. The history search are stored and shown on the left.
 
-  ## Features:
-  ### This weather dashboard shows the current weather and a 5-day forcast of the searched location, and history is save to localstorage. Currently the history btn are not working properly so click on them will not render back the data, I will keep working on this later.
+![page screenshot](./assests/image/screenshot.JPG)
 
-  ## Contributors:
-  ### N/A
+## Credits:
+
+### OpenWeatherMap: https://openweathermap.org/
+
+## License: MIT ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+## Features:
+
+### This weather dashboard shows the current weather and a 5-day forcast of the searched location, and history is save to localstorage. When the history buttons are clicked, the previously searched city weather forcast will be shown.
+
+## Contributors:
+
+### N/A
