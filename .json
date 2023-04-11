@@ -1,5 +1,5 @@
 // 20230227233744
-// https://api.openweathermap.org/data/2.5/forecast?lat=45&lon=-75&appid=bb4a1b568b127289c6d9c3faa7e36c69
+// https://api.openweathermap.org/data/2.5/forecast?lat=45&lon=-75&appid=bb4a1b568b127289c6d9c3faa7e36c69&units=metric
 
 {
     "cod": "200",
